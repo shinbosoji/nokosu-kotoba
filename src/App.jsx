@@ -309,6 +309,21 @@ function OnboardingScreen({ profile, onChange, onStart }) {
       >
         お話を始める
       </button>
+
+      <p
+        style={{
+          fontSize: '12px',
+          color: '#B8AFA2',
+          lineHeight: 1.9,
+          marginTop: '36px',
+          paddingTop: '16px',
+          borderTop: `1px solid ${LINE}`,
+        }}
+      >
+        ホーム画面に追加すると便利です。
+        <br />
+        (iPhone: 共有ボタン →「ホーム画面に追加」/ Android: メニュー →「ホーム画面に追加」)
+      </p>
     </div>
   );
 }
@@ -324,6 +339,7 @@ export default function App() {
   const [started, setStarted] = useState(false);
   const [onboarded, setOnboarded] = useState(false);
   const [showPersonal, setShowPersonal] = useState(true);
+  const [isFullscreen, setIsFullscreen] = useState(false);
   const scrollRef = useRef(null);
   const [error, setError] = useState(null);
   const [isListening, setIsListening] = useState(false);
@@ -542,7 +558,7 @@ export default function App() {
     setOnboarded(false);
     setStarted(false);
     try {
-      await window.storage.delete(STORAGE_KEY);
+      localStorage.removeItem(STORAGE_KEY);
     } catch (e) {
       // ignore
     }
@@ -627,16 +643,36 @@ export default function App() {
       ) : (
         <div style={{ display: 'flex', gap: '24px', alignItems: 'flex-start', flexWrap: 'wrap' }}>
           <div
-            style={{
-              flex: '1 1 360px',
-              minWidth: '320px',
-              background: '#FFFFFF',
-              border: `1px solid ${LINE}`,
-              borderRadius: '4px',
-              display: 'flex',
-              flexDirection: 'column',
-              height: '560px',
-            }}
+            style={
+              isFullscreen
+                ? {
+                    position: 'fixed',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    width: '100vw',
+                    height: '100vh',
+                    background: '#FFFFFF',
+                    border: 'none',
+                    borderRadius: 0,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    zIndex: 1000,
+                  }
+                : {
+                    flex: '1 1 360px',
+                    minWidth: '320px',
+                    background: '#FFFFFF',
+                    border: `1px solid ${LINE}`,
+                    borderRadius: '4px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    height: '560px',
+                    cursor: 'pointer',
+                  }
+            }
+            onClick={!isFullscreen ? () => setIsFullscreen(true) : undefined}
           >
             <div
               style={{
@@ -657,22 +693,58 @@ export default function App() {
               >
                 {profile.name} さんとのお話
               </span>
-              <button
-                onClick={handleNewSession}
-                disabled={loading}
-                style={{
-                  background: 'transparent',
-                  border: `1px solid ${LINE}`,
-                  borderRadius: '4px',
-                  padding: '6px 12px',
-                  fontSize: '12px',
-                  color: loading ? '#D8CFC0' : '#8A8276',
-                  cursor: loading ? 'default' : 'pointer',
-                  fontFamily: '"Noto Sans JP", sans-serif',
-                }}
-              >
-                新しい話題を聞く
-              </button>
+              <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleNewSession();
+                  }}
+                  disabled={loading}
+                  style={{
+                    background: 'transparent',
+                    border: `1px solid ${LINE}`,
+                    borderRadius: '4px',
+                    padding: '6px 12px',
+                    fontSize: '12px',
+                    color: loading ? '#D8CFC0' : '#8A8276',
+                    cursor: loading ? 'default' : 'pointer',
+                    fontFamily: '"Noto Sans JP", sans-serif',
+                  }}
+                >
+                  新しい話題を聞く
+                </button>
+                {isFullscreen && (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setIsFullscreen(false);
+                    }}
+                    style={{
+                      background: 'transparent',
+                      border: `1px solid ${LINE}`,
+                      borderRadius: '4px',
+                      padding: '6px 12px',
+                      fontSize: '12px',
+                      color: '#8A8276',
+                      cursor: 'pointer',
+                      fontFamily: '"Noto Sans JP", sans-serif',
+                    }}
+                  >
+                    閉じる
+                  </button>
+                )}
+                {!isFullscreen && (
+                  <span
+                    style={{
+                      fontSize: '11px',
+                      color: '#C2B9AC',
+                      fontFamily: '"Noto Sans JP", sans-serif',
+                    }}
+                  >
+                    タップで全画面
+                  </span>
+                )}
+              </div>
             </div>
 
             <div ref={scrollRef} style={{ flex: 1, overflowY: 'auto', padding: '18px' }}>
@@ -869,3 +941,4 @@ export default function App() {
     </div>
   );
 }
+
