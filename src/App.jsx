@@ -238,7 +238,7 @@ function DocSection({ title, accentColor, entries, emptyText, icon, onExport }) 
               >
                 {c}
               </p>
-            ))}
+))}
           </div>
         ))
       )}
@@ -309,21 +309,6 @@ function OnboardingScreen({ profile, onChange, onStart }) {
       >
         お話を始める
       </button>
-
-      <p
-        style={{
-          fontSize: '12px',
-          color: '#B8AFA2',
-          lineHeight: 1.9,
-          marginTop: '36px',
-          paddingTop: '16px',
-          borderTop: `1px solid ${LINE}`,
-        }}
-      >
-        ホーム画面に追加すると便利です。
-        <br />
-        (iPhone: 共有ボタン →「ホーム画面に追加」/ Android: メニュー →「ホーム画面に追加」)
-      </p>
     </div>
   );
 }
@@ -492,8 +477,7 @@ export default function App() {
     }
     setLoading(false);
   };
-
-  const handleOnboardStart = () => {
+const handleOnboardStart = () => {
     setOnboarded(true);
     setStarted(true);
     const greeting = {
@@ -579,6 +563,7 @@ export default function App() {
         background: PAPER,
         minHeight: '700px',
         padding: '32px',
+        paddingBottom: '48px',
         boxSizing: 'border-box',
       }}
     >
@@ -651,8 +636,8 @@ export default function App() {
                     left: 0,
                     right: 0,
                     bottom: 0,
-                    width: '100vw',
-                    height: '100vh',
+                    width: '100%',
+                    height: '100%',
                     background: '#FFFFFF',
                     border: 'none',
                     borderRadius: 0,
@@ -732,7 +717,7 @@ export default function App() {
                   >
                     閉じる
                   </button>
-                )}
+)}
                 {!isFullscreen && (
                   <span
                     style={{
@@ -747,7 +732,7 @@ export default function App() {
               </div>
             </div>
 
-            <div ref={scrollRef} style={{ flex: 1, overflowY: 'auto', padding: '18px' }}>
+            <div ref={scrollRef} style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: '18px' }}>
               {messages.map((m, i) => {
                 if (m.content.startsWith('(') && m.content.endsWith(')')) return null;
                 return (
@@ -801,7 +786,7 @@ export default function App() {
               )}
             </div>
 
-            <div style={{ borderTop: `1px solid ${LINE}`, padding: '12px 14px', display: 'flex', gap: '8px' }}>
+            <div style={{ borderTop: `1px solid ${LINE}`, padding: '12px 14px', display: 'flex', gap: '8px', flexShrink: 0 }}>
               <textarea
                 value={input}
                 onChange={(e) => {
@@ -938,7 +923,33 @@ export default function App() {
           </div>
         </div>
       )}
+
+      {!isFullscreen && (
+        <div
+          style={{
+            position: 'fixed',
+            bottom: 0,
+            left: 0,
+            right: 0,
+            background: '#FFFFFF',
+            borderTop: `1px solid ${LINE}`,
+            padding: '6px 12px',
+            textAlign: 'center',
+            zIndex: 500,
+          }}
+        >
+          <p
+            style={{
+              fontSize: '11px',
+              color: '#B8AFA2',
+              lineHeight: 1.6,
+              margin: 0,
+            }}
+          >
+            ホーム画面に追加すると便利です(iPhone: 共有ボタン→「ホーム画面に追加」/ Android: メニュー→「ホーム画面に追加」)
+          </p>
+        </div>
+      )}
     </div>
   );
 }
-
