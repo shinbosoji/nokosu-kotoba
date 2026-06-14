@@ -1,4 +1,3 @@
-cat > src/App.jsx << 'EOF'
 import React, { useState, useRef, useEffect } from 'react';
 
 const ACCENT = '#C97B5C';
