@@ -238,7 +238,7 @@ function DocSection({ title, accentColor, entries, emptyText, icon, onExport }) 
               >
                 {c}
               </p>
-))}
+            ))}
           </div>
         ))
       )}
@@ -248,7 +248,7 @@ function DocSection({ title, accentColor, entries, emptyText, icon, onExport }) 
           background: 'transparent',
           border: `1px solid ${LINE}`,
           borderRadius: '4px',
-          padding: '7px 14px',
+padding: '7px 14px',
           fontSize: '12px',
           color: '#8A8276',
           cursor: 'pointer',
@@ -325,6 +325,14 @@ export default function App() {
   const [onboarded, setOnboarded] = useState(false);
   const [showPersonal, setShowPersonal] = useState(true);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [viewportHeight, setViewportHeight] = useState(
+    typeof window !== 'undefined' && window.visualViewport
+      ? window.visualViewport.height
+      : typeof window !== 'undefined'
+      ? window.innerHeight
+      : 800
+  );
+  const [viewportOffsetTop, setViewportOffsetTop] = useState(0);
   const scrollRef = useRef(null);
   const [error, setError] = useState(null);
   const [isListening, setIsListening] = useState(false);
@@ -337,6 +345,33 @@ export default function App() {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
   }, [messages, loading]);
+
+  useEffect(() => {
+    const vv = window.visualViewport;
+    if (!vv) return;
+    const handleResize = () => {
+      setViewportHeight(vv.height);
+      setViewportOffsetTop(vv.offsetTop);
+    };
+    vv.addEventListener('resize', handleResize);
+    vv.addEventListener('scroll', handleResize);
+    handleResize();
+    return () => {
+      vv.removeEventListener('resize', handleResize);
+      vv.removeEventListener('scroll', handleResize);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (isFullscreen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isFullscreen]);
 
   useEffect(() => {
     try {
@@ -463,7 +498,7 @@ export default function App() {
       if (Array.isArray(parsed.personalDraftUpdates) && parsed.personalDraftUpdates.length > 0) {
         setPersonalEntries((prev) => [
           ...prev,
-          ...parsed.personalDraftUpdates.map((e) => ({ ...e, date: now })),
+...parsed.personalDraftUpdates.map((e) => ({ ...e, date: now })),
         ]);
       }
       if (Array.isArray(parsed.familySummaryUpdates) && parsed.familySummaryUpdates.length > 0) {
@@ -477,7 +512,8 @@ export default function App() {
     }
     setLoading(false);
   };
-const handleOnboardStart = () => {
+
+  const handleOnboardStart = () => {
     setOnboarded(true);
     setStarted(true);
     const greeting = {
@@ -632,18 +668,18 @@ const handleOnboardStart = () => {
               isFullscreen
                 ? {
                     position: 'fixed',
-                    top: 0,
+                    top: `${viewportOffsetTop}px`,
                     left: 0,
                     right: 0,
-                    bottom: 0,
                     width: '100%',
-                    height: '100%',
+                    height: `${viewportHeight}px`,
                     background: '#FFFFFF',
                     border: 'none',
                     borderRadius: 0,
                     display: 'flex',
                     flexDirection: 'column',
                     zIndex: 1000,
+                    overflow: 'hidden',
                   }
                 : {
                     flex: '1 1 360px',
@@ -712,12 +748,12 @@ const handleOnboardStart = () => {
                       fontSize: '12px',
                       color: '#8A8276',
                       cursor: 'pointer',
-                      fontFamily: '"Noto Sans JP", sans-serif',
+fontFamily: '"Noto Sans JP", sans-serif',
                     }}
                   >
                     閉じる
                   </button>
-)}
+                )}
                 {!isFullscreen && (
                   <span
                     style={{
